@@ -5,7 +5,11 @@ import mongoose from "mongoose";
 dotenv.config({ path: "./.env" });
 
 const PORT = 3000;
-const db_url = "mongodb://localhost:27017/env_vault";
+const db_url = process.env.MONGO_URL;
+
+if (!db_url) {
+  throw new Error("Db url not found");
+}
 
 mongoose
   .connect(db_url)
