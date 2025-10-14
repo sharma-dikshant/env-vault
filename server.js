@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import app from "./app.js";
 import mongoose from "mongoose";
 
-dotenv.config({ path: "./config.env" });
+dotenv.config({ path: "./.env" });
 
 const PORT = 3000;
 const db_url = "mongodb://localhost:27017/env_vault";
