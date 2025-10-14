@@ -21,11 +21,19 @@ const projectSchema = new mongoose.Schema(
         },
       },
     ],
+    isActive:{
+      type:Boolean,
+      default:true,
+    }
   },
   {
     timestamps: true,
   }
 );
+projectSchema.pre(/^find/, function (next) {
+  this.where({ isActive: true });
+  next();
+});
 
 const Project = mongoose.model("Project", projectSchema);
 export default Project;
