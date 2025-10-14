@@ -1,0 +1,28 @@
+version: '1.0'
+services:
+  app:
+    build: .
+    container_name: envvault-app
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/envvault
+      - NODE_ENV=development
+      - JWT_SECRET=my_super_secret
+    depends_on:
+      - mongo
+    volumes:
+      - .:/usr/src/envvault-server
+    command: npm run dev
+
+  mongo:
+    image: mongo:6
+    container_name: envvault-mongo
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
