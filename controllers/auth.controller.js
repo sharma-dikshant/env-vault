@@ -1,5 +1,8 @@
 import jwt from "jsonwebtoken";
 import User from "./../models/users.model.js";
+import { OAuth2Client } from "google-auth-library";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const createAccessToken = (data) => {
   const secret = process.env.JWT_SECRET;
@@ -11,7 +14,7 @@ const createAccessToken = (data) => {
 
 export const loginWithPassword = async (req, res, next) => {
   const { email, password } = req.body;
-
+  console.log(email, password)
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -56,6 +59,41 @@ export const signup = async (req, res, next) => {
     console.log(error);
     return res.status(400).json({
       message: "failed signup",
+      error: error.message,
+    });
+  }
+};
+
+export const loginWithGoogle = async (req, res, next) => {
+  const { idToken } = req.body;
+  if (!idToken) {
+    return res
+      .status(400)
+      .json({ message: "failed login", error: "token is not given" });
+  }
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    console.log(idToken, ticket)
+    const payload = ticket.getPayload();
+
+    console.log(payload)
+    const token = createAccessToken({
+      name: payload.name,
+      email: payload.email,
+    });
+
+    return res.status(200).json({
+      message: "success loged in",
+      token,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "internal server error",
       error: error.message,
     });
   }
