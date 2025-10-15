@@ -9,7 +9,7 @@ const createAccessToken = (data) => {
   return jwt.sign(data, secret);
 };
 
-export const login = async (req, res, next) => {
+export const loginWithPassword = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
@@ -20,7 +20,7 @@ export const login = async (req, res, next) => {
       });
     }
 
-    if (password != user.password) {
+    if (!user.correctPassword(password)) {
       return res.status(403).json({
         message: "invalid password",
       });
@@ -40,19 +40,20 @@ export const login = async (req, res, next) => {
 };
 
 export const logout = (req, res, next) => {
-  res.status(200).json({ message: "Logout sucess" });
+  res.status(200).json({ message: "Logout sucess", token: "invalid" });
 };
 
 export const signup = async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, google_id } = req.body;
   try {
-    const newUser = await User.create({ name, email, password });
+    const newUser = await User.create({ name, email, password, google_id });
     const token = createAccessToken({ _id: newUser._id, name, email });
     res.status(200).json({
       message: "Signup sucess",
       token,
     });
   } catch (error) {
+    console.log(error);
     return res.status(400).json({
       message: "failed signup",
       error: error.message,
