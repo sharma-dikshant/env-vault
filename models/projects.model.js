@@ -16,11 +16,19 @@ const projectSchema = new mongoose.Schema(
           required: [true, "Secret is required"],
         },
         value: {
-            type: String,
-            required: [true, "Value is required"]
+          type: String,
+          required: [true, "Value is required"],
+        },
+        isActive: {
+          type: Boolean,
+          default: true,
         },
       },
     ],
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
