@@ -4,7 +4,7 @@ import { catchAsync } from "../utils/catchAsync.js";
 export const getAllProjects = catchAsync(async (req, res, next) => {
   const project = await Project.find({ user: req.user._id, isActive: false });
   if (project.length == 0) {
-    res.status(200).json({ message: "No project found" });
+    return res.status(200).json({ message: "No project found" });
   }
   res.status(200).json({ message: "All projects", project });
 });
