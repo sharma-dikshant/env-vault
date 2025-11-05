@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
+dotenv.config();
 import app from "./app.js";
 import mongoose from "mongoose";
 
-dotenv.config({ path: "./.env" });
 
 const PORT = 3000;
 const db_url = process.env.MONGO_URL;

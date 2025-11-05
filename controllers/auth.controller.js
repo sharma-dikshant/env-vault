@@ -7,18 +7,20 @@ import { AppError } from "../utils/appError.js";
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const secret = process.env.JWT_SECRET;
 
+
 const createAccessToken = (data) => {
-  if (!secret) {
+  console.log(process.env.JWT_SECRET);
+  if (!process.env.JWT_SECRET) {
     throw new Error("Jwt secret is not defined");
   }
-  return jwt.sign(data, secret);
+  return jwt.sign(data, process.env.JWT_SECRET);
 };
 
 const verifyToken = (token) => {
   if (!token) {
     throw new Error("no access token");
   }
-  return jwt.verify(token, secret);
+  return jwt.verify(token, process.env.JWT_SECRET);
 };
 
 export const loginWithPassword = catchAsync(async (req, res, next) => {
@@ -88,6 +90,7 @@ export const loginWithGoogle = catchAsync(async (req, res, next) => {
 
 export const protect = catchAsync(async (req, res, next) => {
   let token = "";
+  console.log(req.cookies);
   if (req.cookies && req.cookies.authToken) {
     token = req.cookies.authToken;
   } else if (

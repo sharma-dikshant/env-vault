@@ -29,25 +29,29 @@ export const updateProjectSecret = async (req, res, next) => {
   try {
     const { projectId, secretId } = req.params;
     const secretData = req.body;
-    const { userId } = req.user._id;
+    const userId  = req.user._id;
     if (!projectId || !secretId) {
       return res
         .status(400)
         .json({ message: "Project ID and Secret ID are required" });
     }
-    if (!secretData) {
+
+    if (secretData.key == "" || secretData.value == "") {
       return res
         .status(400)
         .json({ message: "Secret data {key,value} pair is required" });
     }
+
     const project = await Project.findOne({
       _id: projectId,
       isActive: true,
-      user: userId,
+      // user: userId,
     });
-    if (!project) {
+
+    if (project.length == 0) {
       return res.status(404).json({ message: "Project not found" });
     }
+
     const totalSecrets = project.secret.length;
     let updated = false;
     for (let i = 0; i < totalSecrets; i++) {
@@ -67,6 +71,7 @@ export const updateProjectSecret = async (req, res, next) => {
     if (!updated) {
       return res.status(404).json({ message: "Some error ocurred" });
     }
+
   } catch (err) {
     console.log(err);
     return res
@@ -105,6 +110,30 @@ export const updateProjectName = async (req, res, next) => {
       .json({ message: "Internal Server Error", error: err.message });
   }
 };
+
+export const addEnvs = async (req,res) => {
+  try{
+    const {projectId} = req.params;
+    const {key,value} = req.body;
+
+    if(!key || !value){
+      return res.status(400).json({message: "Key or value is required"});
+    }
+
+    const data = {key,value};
+
+   const newProject = await Project.findOneAndUpdate(
+    {_id: projectId}, 
+    { $push: { secret:data } },
+    {new: true}
+  );
+
+  return res.status(200).json({message: "Added envs successfully", data: newProject});
+
+  }catch(err){
+    return res.status(500).json({message: "Internal Server Error"});
+  }
+}
 
 export const deleteProjectSecret = async (req,res,next) => {
   try{
